@@ -1,5 +1,5 @@
-const boardLength = 50
-const fps = 165;
+const boardLength = 16
+const fps = 20;
 let w;
 let h;
 let grid = new Array(boardLength);
@@ -19,7 +19,7 @@ function Node(x, y) {
     this.previous = null;
 	this.wall = false;
 
-	if (Math.random(1) < 0.3 && this.x > 0 && this.y > 0) {
+	if (Math.random(1) < 0.1 && this.x > 0 && this.y > 0) {
         this.wall = true;
     }
 
@@ -187,7 +187,9 @@ function draw() {
         console.log('(',end.x,end.y,')');
 
         if(current == end){
-            removeElement(foods, end);
+            removeElement(foods, current);
+            toVisit = [];
+            toVisit.push(current);
         }
 
         removeElement(toVisit, current);
