@@ -1,4 +1,5 @@
-const boardLength = 20
+const boardLength = 50
+const fps = 165;
 let w;
 let h;
 let grid = new Array(boardLength);
@@ -145,7 +146,7 @@ function generateFoods(grid, nFoods) {
 function setup() {
     createCanvas(800, 800);
     background(0);
-    frameRate(10);
+    frameRate(fps);
     w = width / boardLength;
     h = height / boardLength;
 
@@ -168,22 +169,25 @@ function setup() {
 
     start = grid[0][0];
 	foods = generateFoods(grid, boardLength/2);
-    end = getCloserDot(start, foods);
     toVisit.push(start);
 }
 
 function draw() {
-    if (foods.length == 0) {
+    if (foods.length == 0 || toVisit.length == 0) {
         noLoop();
+        return;
     }
+
+    end = getCloserDot(start, foods);
 
     if (foods.length > 0) {
         let lowest = getLowestF(toVisit);
         var current = toVisit[lowest];
-        end = getCloserDot(end, foods);
+
+        console.log('(',end.x,end.y,')');
 
         if(current == end){
-            removeElement(foods, current);
+            removeElement(foods, end);
         }
 
         removeElement(toVisit, current);
@@ -227,7 +231,6 @@ function draw() {
 	visited.forEach(v => {
 		v.show(color(254, 164, 127));
 	});
-
     
 	toVisit.forEach(v => {
 		v.show(color(109, 33, 79));
