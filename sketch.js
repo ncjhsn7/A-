@@ -1,4 +1,4 @@
-const boardLength = 10
+const boardLength = 20
 let w;
 let h;
 let grid = new Array(boardLength);
@@ -120,10 +120,32 @@ function getCloserDot(current, foods) {
     return near;
 }
 
+function generateFoods(grid, nFoods) {
+    let foods = [];
+    while (foods.length < Math.floor(nFoods)) {
+        for (let i = 0; i < grid.length; i++) {
+            for (let j = 0; j < grid.length; j++) {
+                if (Math.random(1) < 0.001 && grid[i][j].x > 0 && grid[i][j].y > 0 && foods.length < nFoods) {
+                    foods.push(grid[i][j]);
+                }
+            }
+        }
+    }
+
+    for (let i = 0; i < grid.length; i++) {
+        for (let j = 0; j < grid.length; j++) {
+            if (foods.includes(grid[i][j])) {
+                grid[i][j].wall = false;
+            }
+        }
+    }
+    return foods;
+}
+
 function setup() {
     createCanvas(800, 800);
     background(0);
-
+    frameRate(10);
     w = width / boardLength;
     h = height / boardLength;
 
@@ -145,29 +167,24 @@ function setup() {
     }
 
     start = grid[0][0];
-	foods = [grid[1][1], grid[2][2], grid[5][5]];
-    end = grid[boardLength-1][boardLength-1]//getCloserDot(start, foods);
+	foods = generateFoods(grid, boardLength/2);
+    end = getCloserDot(start, foods);
     toVisit.push(start);
 }
 
 function draw() {
-    if (toVisit.length > 0) {
+    if (foods.length == 0) {
+        noLoop();
+    }
+
+    if (foods.length > 0) {
         let lowest = getLowestF(toVisit);
         var current = toVisit[lowest];
+        end = getCloserDot(end, foods);
 
-		if (current == end) {
-			noLoop();
-		}
-
-        // if (foods.length == 0) {
-        //     noLoop();
-        // }
-
-		// if(current == end && foods.length > 0){
-		// 	removeElement(foods, end);
-		// 	end = getCloserDot(end, foods);
-		// 	console.log('closer -> ', getCloserDot(current,foods));
-		// }
+        if(current == end){
+            removeElement(foods, current);
+        }
 
         removeElement(toVisit, current);
         visited.push(current);
@@ -202,16 +219,19 @@ function draw() {
             grid[i][j].show(color(255));
         }
     }
-	
-	end.show(color(27, 156, 252));
+
+    foods.forEach(food => {
+        food.show(color(37, 204, 247));
+    });
 
 	visited.forEach(v => {
 		v.show(color(254, 164, 127));
 	});
 
+    
 	toVisit.forEach(v => {
-		v.show(color(0, 255, 0));
-	});
+		v.show(color(109, 33, 79));
+	});    
 
     path = showPath(current);
 
